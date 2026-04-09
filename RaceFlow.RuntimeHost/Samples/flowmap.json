@@ -1,0 +1,2670 @@
+{
+  "format": "flowmap",
+  "version": "1.0.0",
+  "layoutName": "World 1 Flow Test",
+  "exportedAtUtc": "2026-03-30T02:24:26.528Z",
+  "sections": [
+    {
+      "side": "left",
+      "displayName": "Zone 1",
+      "direction": "bottom-to-top",
+      "segmentCount": 1,
+      "segments": [
+        {
+          "id": "segment_1774836897762_73259_0",
+          "index": 0,
+          "label": "W1Z1",
+          "side": "left",
+          "direction": "bottom-to-top",
+          "pewFileName": "W1Z1_cp_flow2.pew",
+          "checkpointFileName": "W1Z1_cp.xml",
+          "nodeCount": 14,
+          "checkpointRecordCount": 14,
+          "nodes": [
+            {
+              "id": "n_uediiy",
+              "index": 0,
+              "label": "W1-Z1 Start",
+              "runtimeLabel": "W1Z1 | W1-Z1 Start | START",
+              "type": "start",
+              "planner": {
+                "title": "W1-Z1 Start",
+                "x": -427,
+                "y": 350,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 0,
+                "checkpointLabel": "START",
+                "mapId": "15",
+                "position": {
+                  "x": -384.7481,
+                  "y": 71.86426,
+                  "z": 588.5827
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "start"
+              },
+              "graph": {
+                "inputCount": 0,
+                "outputCount": 1,
+                "graphInputs": [],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_r7bnpy",
+                    "toNodeTitle": "CP1",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_r7bnpy"
+                ]
+              }
+            },
+            {
+              "id": "n_r7bnpy",
+              "index": 1,
+              "label": "CP1",
+              "runtimeLabel": "W1Z1 | CP1 | CP 1",
+              "type": "checkpoint",
+              "planner": {
+                "title": "CP1",
+                "x": -32,
+                "y": 351,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 1,
+                "checkpointLabel": "CP 1",
+                "mapId": "15",
+                "position": {
+                  "x": -427.4112,
+                  "y": 35.72156,
+                  "z": 448.2892
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "Shaemore",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_uediiy",
+                    "fromNodeTitle": "W1-Z1 Start",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_jf5wba",
+                    "toNodeTitle": "CP2",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_jf5wba"
+                ]
+              }
+            },
+            {
+              "id": "n_jf5wba",
+              "index": 2,
+              "label": "CP2",
+              "runtimeLabel": "W1Z1 | CP2 | CP 2",
+              "type": "checkpoint",
+              "planner": {
+                "title": "CP2",
+                "x": 293,
+                "y": 352,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 2,
+                "checkpointLabel": "CP 2",
+                "mapId": "15",
+                "position": {
+                  "x": -215.15868,
+                  "y": 28.37634,
+                  "z": 413.43195
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "fort",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_r7bnpy",
+                    "fromNodeTitle": "CP1",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_bnoetb",
+                    "toNodeTitle": "Path Split",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_bnoetb"
+                ]
+              }
+            },
+            {
+              "id": "n_bnoetb",
+              "index": 3,
+              "label": "Path Split",
+              "runtimeLabel": "W1Z1 | Path Split | SPLIT",
+              "type": "split",
+              "planner": {
+                "title": "Path Split",
+                "x": 646,
+                "y": 351,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 3,
+                "checkpointLabel": "SPLIT",
+                "mapId": "15",
+                "position": {
+                  "x": -132.74597,
+                  "y": 32.86769,
+                  "z": 167.6341
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "hero point",
+                "checkpointType": "split"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 2,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_jf5wba",
+                    "fromNodeTitle": "CP2",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_6vlhao",
+                    "toNodeTitle": "P1 - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  },
+                  {
+                    "toNodeId": "n_wydm82",
+                    "toNodeTitle": "P2 - CP3",
+                    "fromSocketIndex": 1,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_6vlhao",
+                  "n_wydm82"
+                ]
+              }
+            },
+            {
+              "id": "n_6vlhao",
+              "index": 4,
+              "label": "P1 - CP3",
+              "runtimeLabel": "W1Z1 | P1 - CP3 | P1-CP3",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P1 - CP3",
+                "x": 914,
+                "y": 241,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 4,
+                "checkpointLabel": "P1-CP3",
+                "mapId": "15",
+                "position": {
+                  "x": -221.10123,
+                  "y": 8.6276,
+                  "z": -23.32524
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_bnoetb",
+                    "fromNodeTitle": "Path Split",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_3ewuy4",
+                    "toNodeTitle": "P1 - CP4",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_3ewuy4"
+                ]
+              }
+            },
+            {
+              "id": "n_3ewuy4",
+              "index": 5,
+              "label": "P1 - CP4",
+              "runtimeLabel": "W1Z1 | P1 - CP4 | P1-CP4",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P1 - CP4",
+                "x": 1236,
+                "y": 241,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 5,
+                "checkpointLabel": "P1-CP4",
+                "mapId": "15",
+                "position": {
+                  "x": -484.5026,
+                  "y": 16.41839,
+                  "z": -150.79866
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_6vlhao",
+                    "fromNodeTitle": "P1 - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_h53npm",
+                    "toNodeTitle": "P1 - CP5",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_h53npm"
+                ]
+              }
+            },
+            {
+              "id": "n_h53npm",
+              "index": 6,
+              "label": "P1 - CP5",
+              "runtimeLabel": "W1Z1 | P1 - CP5 | P1-CP5",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P1 - CP5",
+                "x": 1569,
+                "y": 238,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 6,
+                "checkpointLabel": "P1-CP5",
+                "mapId": "15",
+                "position": {
+                  "x": -581.7487,
+                  "y": 10.39833,
+                  "z": -281.3255
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_3ewuy4",
+                    "fromNodeTitle": "P1 - CP4",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_v5uhgv",
+                    "toNodeTitle": "Converge",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_v5uhgv"
+                ]
+              }
+            },
+            {
+              "id": "n_wydm82",
+              "index": 7,
+              "label": "P2 - CP3",
+              "runtimeLabel": "W1Z1 | P2 - CP3 | P2-CP3",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P2 - CP3",
+                "x": 921,
+                "y": 462,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 7,
+                "checkpointLabel": "P2-CP3",
+                "mapId": "15",
+                "position": {
+                  "x": -61.82538,
+                  "y": 20.65943,
+                  "z": 25.96895
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_bnoetb",
+                    "fromNodeTitle": "Path Split",
+                    "fromSocketIndex": 1,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_8pc5kl",
+                    "toNodeTitle": "P2 - CP4",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_8pc5kl"
+                ]
+              }
+            },
+            {
+              "id": "n_8pc5kl",
+              "index": 8,
+              "label": "P2 - CP4",
+              "runtimeLabel": "W1Z1 | P2 - CP4 | P2-CP4",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P2 - CP4",
+                "x": 1240,
+                "y": 465,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 8,
+                "checkpointLabel": "P2-CP4",
+                "mapId": "15",
+                "position": {
+                  "x": -188.18903,
+                  "y": 17.72874,
+                  "z": -183.74605
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_wydm82",
+                    "fromNodeTitle": "P2 - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_atmhbc",
+                    "toNodeTitle": "P2 - CP5",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_atmhbc"
+                ]
+              }
+            },
+            {
+              "id": "n_atmhbc",
+              "index": 9,
+              "label": "P2 - CP5",
+              "runtimeLabel": "W1Z1 | P2 - CP5 | P2-CP5",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P2 - CP5",
+                "x": 1574,
+                "y": 464,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 9,
+                "checkpointLabel": "P2-CP5",
+                "mapId": "15",
+                "position": {
+                  "x": -365.7242,
+                  "y": 36.78184,
+                  "z": -383.91333
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_8pc5kl",
+                    "fromNodeTitle": "P2 - CP4",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_v5uhgv",
+                    "toNodeTitle": "Converge",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 1
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_v5uhgv"
+                ]
+              }
+            },
+            {
+              "id": "n_v5uhgv",
+              "index": 10,
+              "label": "Converge",
+              "runtimeLabel": "W1Z1 | Converge | CONVERGE",
+              "type": "converge",
+              "planner": {
+                "title": "Converge",
+                "x": 1983,
+                "y": 357,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 10,
+                "checkpointLabel": "CONVERGE",
+                "mapId": "15",
+                "position": {
+                  "x": -284.38025,
+                  "y": 33.76431,
+                  "z": -460.64392
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "converge"
+              },
+              "graph": {
+                "inputCount": 2,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_h53npm",
+                    "fromNodeTitle": "P1 - CP5",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  },
+                  {
+                    "fromNodeId": "n_atmhbc",
+                    "fromNodeTitle": "P2 - CP5",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 1
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_wdnkbs",
+                    "toNodeTitle": "CP6",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_wdnkbs"
+                ]
+              }
+            },
+            {
+              "id": "n_wdnkbs",
+              "index": 11,
+              "label": "CP6",
+              "runtimeLabel": "W1Z1 | CP6 | CP 6",
+              "type": "checkpoint",
+              "planner": {
+                "title": "CP6",
+                "x": 2320,
+                "y": 358,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 11,
+                "checkpointLabel": "CP 6",
+                "mapId": "15",
+                "position": {
+                  "x": 30.36505,
+                  "y": 22.64213,
+                  "z": -266.27225
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_v5uhgv",
+                    "fromNodeTitle": "Converge",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_1owr7c",
+                    "toNodeTitle": "CP7",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_1owr7c"
+                ]
+              }
+            },
+            {
+              "id": "n_1owr7c",
+              "index": 12,
+              "label": "CP7",
+              "runtimeLabel": "W1Z1 | CP7 | CP 7",
+              "type": "checkpoint",
+              "planner": {
+                "title": "CP7",
+                "x": 2670,
+                "y": 358,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 12,
+                "checkpointLabel": "CP 7",
+                "mapId": "15",
+                "position": {
+                  "x": 358.57806,
+                  "y": -0.78643,
+                  "z": -504.56427
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_wdnkbs",
+                    "fromNodeTitle": "CP6",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_dhj64l",
+                    "toNodeTitle": "W1-Z1 End",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_dhj64l"
+                ]
+              }
+            },
+            {
+              "id": "n_dhj64l",
+              "index": 13,
+              "label": "W1-Z1 End",
+              "runtimeLabel": "W1Z1 | W1-Z1 End | END",
+              "type": "end",
+              "planner": {
+                "title": "W1-Z1 End",
+                "x": 3045,
+                "y": 363,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 13,
+                "checkpointLabel": "END",
+                "mapId": "15",
+                "position": {
+                  "x": 351.39777,
+                  "y": 5.86783,
+                  "z": -652.7171
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "end"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 0,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_1owr7c",
+                    "fromNodeTitle": "CP7",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [],
+                "runtimeOutputNodeIds": []
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "side": "top",
+      "displayName": "Zone 2",
+      "direction": "left-to-right",
+      "segmentCount": 1,
+      "segments": [
+        {
+          "id": "segment_1774836938873_55966_0",
+          "index": 0,
+          "label": "W1Z2",
+          "side": "top",
+          "direction": "left-to-right",
+          "pewFileName": "W1Z2_cp_flow2.pew",
+          "checkpointFileName": "W1Z2_cp.xml",
+          "nodeCount": 13,
+          "checkpointRecordCount": 13,
+          "nodes": [
+            {
+              "id": "n_k4o0pg",
+              "index": 0,
+              "label": "W1-Z2 Start",
+              "runtimeLabel": "W1Z2 | W1-Z2 Start | START",
+              "type": "start",
+              "planner": {
+                "title": "W1-Z2 Start",
+                "x": -427,
+                "y": 350,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 0,
+                "checkpointLabel": "START",
+                "mapId": "23",
+                "position": {
+                  "x": 527.34735,
+                  "y": 52.66992,
+                  "z": 570.6785
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "W1-Z2",
+                "checkpointType": "start"
+              },
+              "graph": {
+                "inputCount": 0,
+                "outputCount": 1,
+                "graphInputs": [],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_crav9e",
+                    "toNodeTitle": "CP1",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_crav9e"
+                ]
+              }
+            },
+            {
+              "id": "n_crav9e",
+              "index": 1,
+              "label": "CP1",
+              "runtimeLabel": "W1Z2 | CP1 | CP 1",
+              "type": "checkpoint",
+              "planner": {
+                "title": "CP1",
+                "x": 138,
+                "y": 351,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 1,
+                "checkpointLabel": "CP 1",
+                "mapId": "23",
+                "position": {
+                  "x": 617.7746,
+                  "y": 37.71386,
+                  "z": 490.54312
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_k4o0pg",
+                    "fromNodeTitle": "W1-Z2 Start",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_4lin6i",
+                    "toNodeTitle": "Path Split",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_4lin6i"
+                ]
+              }
+            },
+            {
+              "id": "n_4lin6i",
+              "index": 2,
+              "label": "Path Split",
+              "runtimeLabel": "W1Z2 | Path Split | SPLIT",
+              "type": "split",
+              "planner": {
+                "title": "Path Split",
+                "x": 526,
+                "y": 349,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 2,
+                "checkpointLabel": "SPLIT",
+                "mapId": "23",
+                "position": {
+                  "x": 395.5673,
+                  "y": 47.93639,
+                  "z": 424.1515
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "split"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 3,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_crav9e",
+                    "fromNodeTitle": "CP1",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_ci0j05",
+                    "toNodeTitle": "P1 - CP2",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  },
+                  {
+                    "toNodeId": "n_bbdwtg",
+                    "toNodeTitle": "P2 - CP2",
+                    "fromSocketIndex": 1,
+                    "toSocketIndex": 0
+                  },
+                  {
+                    "toNodeId": "n_irqe9u",
+                    "toNodeTitle": "P3 - CP2",
+                    "fromSocketIndex": 2,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_ci0j05",
+                  "n_bbdwtg",
+                  "n_irqe9u"
+                ]
+              }
+            },
+            {
+              "id": "n_ci0j05",
+              "index": 3,
+              "label": "P1 - CP2",
+              "runtimeLabel": "W1Z2 | P1 - CP2 | P1-CP2",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P1 - CP2",
+                "x": 914,
+                "y": 241,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 3,
+                "checkpointLabel": "P1-CP2",
+                "mapId": "23",
+                "position": {
+                  "x": 790.85474,
+                  "y": 30.37955,
+                  "z": 155.93636
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_4lin6i",
+                    "fromNodeTitle": "Path Split",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_2ffb65",
+                    "toNodeTitle": "P1 - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_2ffb65"
+                ]
+              }
+            },
+            {
+              "id": "n_2ffb65",
+              "index": 4,
+              "label": "P1 - CP3",
+              "runtimeLabel": "W1Z2 | P1 - CP3 | P1-CP3",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P1 - CP3",
+                "x": 1485,
+                "y": 241,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 4,
+                "checkpointLabel": "P1-CP3",
+                "mapId": "23",
+                "position": {
+                  "x": 351.1166,
+                  "y": 43.42266,
+                  "z": -441.24448
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_ci0j05",
+                    "fromNodeTitle": "P1 - CP2",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_3qvvah",
+                    "toNodeTitle": "Converge",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_3qvvah"
+                ]
+              }
+            },
+            {
+              "id": "n_bbdwtg",
+              "index": 5,
+              "label": "P2 - CP2",
+              "runtimeLabel": "W1Z2 | P2 - CP2 | P2-CP2",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P2 - CP2",
+                "x": 928,
+                "y": 400,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 5,
+                "checkpointLabel": "P2-CP2",
+                "mapId": "23",
+                "position": {
+                  "x": 18.68823,
+                  "y": 56.09719,
+                  "z": 316.01465
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_4lin6i",
+                    "fromNodeTitle": "Path Split",
+                    "fromSocketIndex": 1,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_9p6q3k",
+                    "toNodeTitle": "P2 - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_9p6q3k"
+                ]
+              }
+            },
+            {
+              "id": "n_9p6q3k",
+              "index": 6,
+              "label": "P2 - CP3",
+              "runtimeLabel": "W1Z2 | P2 - CP3 | P2-CP3",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P2 - CP3",
+                "x": 1487,
+                "y": 404,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 6,
+                "checkpointLabel": "P2-CP3",
+                "mapId": "23",
+                "position": {
+                  "x": -184.9323,
+                  "y": 4.69161,
+                  "z": 43.11448
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_bbdwtg",
+                    "fromNodeTitle": "P2 - CP2",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_3qvvah",
+                    "toNodeTitle": "Converge",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 1
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_3qvvah"
+                ]
+              }
+            },
+            {
+              "id": "n_irqe9u",
+              "index": 7,
+              "label": "P3 - CP2",
+              "runtimeLabel": "W1Z2 | P3 - CP2 | P3-CP2",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P3 - CP2",
+                "x": 951,
+                "y": 595,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 7,
+                "checkpointLabel": "P3-CP2",
+                "mapId": "23",
+                "position": {
+                  "x": -255.37494,
+                  "y": 39.86096,
+                  "z": 442.88156
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_4lin6i",
+                    "fromNodeTitle": "Path Split",
+                    "fromSocketIndex": 2,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_cmpv26",
+                    "toNodeTitle": "P3 - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_cmpv26"
+                ]
+              }
+            },
+            {
+              "id": "n_cmpv26",
+              "index": 8,
+              "label": "P3 - CP3",
+              "runtimeLabel": "W1Z2 | P3 - CP3 | P3-CP3",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P3 - CP3",
+                "x": 1489,
+                "y": 601,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 8,
+                "checkpointLabel": "P3-CP3",
+                "mapId": "23",
+                "position": {
+                  "x": -654.0464,
+                  "y": 13.86566,
+                  "z": 112.44508
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_irqe9u",
+                    "fromNodeTitle": "P3 - CP2",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_3qvvah",
+                    "toNodeTitle": "Converge",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 2
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_3qvvah"
+                ]
+              }
+            },
+            {
+              "id": "n_3qvvah",
+              "index": 9,
+              "label": "Converge",
+              "runtimeLabel": "W1Z2 | Converge | CONVERGE",
+              "type": "converge",
+              "planner": {
+                "title": "Converge",
+                "x": 1988,
+                "y": 407,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 9,
+                "checkpointLabel": "CONVERGE",
+                "mapId": "23",
+                "position": {
+                  "x": -375.2473,
+                  "y": 6.35153,
+                  "z": -420.05103
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "converge"
+              },
+              "graph": {
+                "inputCount": 3,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_2ffb65",
+                    "fromNodeTitle": "P1 - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  },
+                  {
+                    "fromNodeId": "n_9p6q3k",
+                    "fromNodeTitle": "P2 - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 1
+                  },
+                  {
+                    "fromNodeId": "n_cmpv26",
+                    "fromNodeTitle": "P3 - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 2
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_dtubxn",
+                    "toNodeTitle": "CP4",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_dtubxn"
+                ]
+              }
+            },
+            {
+              "id": "n_dtubxn",
+              "index": 10,
+              "label": "CP4",
+              "runtimeLabel": "W1Z2 | CP4 | CP 4",
+              "type": "checkpoint",
+              "planner": {
+                "title": "CP4",
+                "x": 2372,
+                "y": 408,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 10,
+                "checkpointLabel": "CP 4",
+                "mapId": "23",
+                "position": {
+                  "x": -332.7272,
+                  "y": 23.8747,
+                  "z": -495.92734
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_3qvvah",
+                    "fromNodeTitle": "Converge",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_edfnsb",
+                    "toNodeTitle": "CP5",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_edfnsb"
+                ]
+              }
+            },
+            {
+              "id": "n_edfnsb",
+              "index": 11,
+              "label": "CP5",
+              "runtimeLabel": "W1Z2 | CP5 | CP 5",
+              "type": "checkpoint",
+              "planner": {
+                "title": "CP5",
+                "x": 2745,
+                "y": 406,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 11,
+                "checkpointLabel": "CP 5",
+                "mapId": "23",
+                "position": {
+                  "x": -154.02902,
+                  "y": 42.12741,
+                  "z": -521.4644
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_dtubxn",
+                    "fromNodeTitle": "CP4",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_vxs5jn",
+                    "toNodeTitle": "W1-Z2 End",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_vxs5jn"
+                ]
+              }
+            },
+            {
+              "id": "n_vxs5jn",
+              "index": 12,
+              "label": "W1-Z2 End",
+              "runtimeLabel": "W1Z2 | W1-Z2 End | END",
+              "type": "end",
+              "planner": {
+                "title": "W1-Z2 End",
+                "x": 3150,
+                "y": 410,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 12,
+                "checkpointLabel": "END",
+                "mapId": "23",
+                "position": {
+                  "x": -173.58125,
+                  "y": 44.8925,
+                  "z": -550.89606
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "end"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 0,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_edfnsb",
+                    "fromNodeTitle": "CP5",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [],
+                "runtimeOutputNodeIds": []
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "side": "right",
+      "displayName": "Zone 3",
+      "direction": "top-to-bottom",
+      "segmentCount": 1,
+      "segments": [
+        {
+          "id": "segment_1774836976900_44918_0",
+          "index": 0,
+          "label": "W1Z3",
+          "side": "right",
+          "direction": "top-to-bottom",
+          "pewFileName": "W1Z3_cp_flow2.pew",
+          "checkpointFileName": "W1Z3_cp.xml",
+          "nodeCount": 15,
+          "checkpointRecordCount": 15,
+          "nodes": [
+            {
+              "id": "n_dwj9fc",
+              "index": 0,
+              "label": "W1-Z3 Start",
+              "runtimeLabel": "W1Z3 | W1-Z3 Start | START",
+              "type": "start",
+              "planner": {
+                "title": "W1-Z3 Start",
+                "x": -658,
+                "y": 773,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 0,
+                "checkpointLabel": "START",
+                "mapId": "34",
+                "position": {
+                  "x": 494.01886,
+                  "y": 16.82078,
+                  "z": 1204.1956
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "W1-Z3",
+                "checkpointType": "start"
+              },
+              "graph": {
+                "inputCount": 0,
+                "outputCount": 1,
+                "graphInputs": [],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_tf7ynl",
+                    "toNodeTitle": "CP1",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_tf7ynl"
+                ]
+              }
+            },
+            {
+              "id": "n_tf7ynl",
+              "index": 1,
+              "label": "CP1",
+              "runtimeLabel": "W1Z3 | CP1 | CP 1",
+              "type": "checkpoint",
+              "planner": {
+                "title": "CP1",
+                "x": -301,
+                "y": 773,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 1,
+                "checkpointLabel": "CP 1",
+                "mapId": "34",
+                "position": {
+                  "x": 438.0161,
+                  "y": 4.23987,
+                  "z": 1075.7732
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_dwj9fc",
+                    "fromNodeTitle": "W1-Z3 Start",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_ywpyg3",
+                    "toNodeTitle": "Path Split",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_ywpyg3"
+                ]
+              }
+            },
+            {
+              "id": "n_ywpyg3",
+              "index": 2,
+              "label": "Path Split",
+              "runtimeLabel": "W1Z3 | Path Split | SPLIT",
+              "type": "split",
+              "planner": {
+                "title": "Path Split",
+                "x": 71,
+                "y": 779,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 2,
+                "checkpointLabel": "SPLIT",
+                "mapId": "34",
+                "position": {
+                  "x": 287.46286,
+                  "y": 8.48834,
+                  "z": 1027.4178
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "split"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 2,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_tf7ynl",
+                    "fromNodeTitle": "CP1",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_flue57",
+                    "toNodeTitle": "Path 1 Split",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  },
+                  {
+                    "toNodeId": "n_xivjif",
+                    "toNodeTitle": "P2 - CP2",
+                    "fromSocketIndex": 1,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_flue57",
+                  "n_xivjif"
+                ]
+              }
+            },
+            {
+              "id": "n_xivjif",
+              "index": 3,
+              "label": "P2 - CP2",
+              "runtimeLabel": "W1Z3 | P2 - CP2 | P2-CP2",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P2 - CP2",
+                "x": 937,
+                "y": 814,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 3,
+                "checkpointLabel": "P2-CP2",
+                "mapId": "34",
+                "position": {
+                  "x": 190.24371,
+                  "y": 9.90446,
+                  "z": 861.8144
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_ywpyg3",
+                    "fromNodeTitle": "Path Split",
+                    "fromSocketIndex": 1,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_wi689r",
+                    "toNodeTitle": "P2 - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_wi689r"
+                ]
+              }
+            },
+            {
+              "id": "n_wi689r",
+              "index": 4,
+              "label": "P2 - CP3",
+              "runtimeLabel": "W1Z3 | P2 - CP3 | P2-CP3",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P2 - CP3",
+                "x": 1417,
+                "y": 813,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 4,
+                "checkpointLabel": "P2-CP3",
+                "mapId": "34",
+                "position": {
+                  "x": 177.33679,
+                  "y": 13.1504,
+                  "z": 514.2913
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_xivjif",
+                    "fromNodeTitle": "P2 - CP2",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_qw4zkw",
+                    "toNodeTitle": "Converge",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 3
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_qw4zkw"
+                ]
+              }
+            },
+            {
+              "id": "n_flue57",
+              "index": 5,
+              "label": "Path 1 Split",
+              "runtimeLabel": "W1Z3 | Path 1 Split | P1-SPLIT",
+              "type": "split",
+              "planner": {
+                "title": "Path 1 Split",
+                "x": 493,
+                "y": 374,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 5,
+                "checkpointLabel": "P1-SPLIT",
+                "mapId": "34",
+                "position": {
+                  "x": -70.5637,
+                  "y": 15.61276,
+                  "z": 832.1969
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 3,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_ywpyg3",
+                    "fromNodeTitle": "Path Split",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_741qd7",
+                    "toNodeTitle": "P1A - CP2",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  },
+                  {
+                    "toNodeId": "n_4wvi8s",
+                    "toNodeTitle": "P1B - CP2",
+                    "fromSocketIndex": 1,
+                    "toSocketIndex": 0
+                  },
+                  {
+                    "toNodeId": "n_x01ipq",
+                    "toNodeTitle": "P1C - CP2",
+                    "fromSocketIndex": 2,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_741qd7",
+                  "n_4wvi8s",
+                  "n_x01ipq"
+                ]
+              }
+            },
+            {
+              "id": "n_741qd7",
+              "index": 6,
+              "label": "P1A - CP2",
+              "runtimeLabel": "W1Z3 | P1A - CP2 | P1A-CP2",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P1A - CP2",
+                "x": 934,
+                "y": 237,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 6,
+                "checkpointLabel": "P1A-CP2",
+                "mapId": "34",
+                "position": {
+                  "x": 61.17729,
+                  "y": 8.90354,
+                  "z": 695.6412
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_flue57",
+                    "fromNodeTitle": "Path 1 Split",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_g0aykx",
+                    "toNodeTitle": "P1A - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_g0aykx"
+                ]
+              }
+            },
+            {
+              "id": "n_g0aykx",
+              "index": 7,
+              "label": "P1A - CP3",
+              "runtimeLabel": "W1Z3 | P1A - CP3 | P1A-CP3",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P1A - CP3",
+                "x": 1405,
+                "y": 237,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 7,
+                "checkpointLabel": "P1A-CP3",
+                "mapId": "34",
+                "position": {
+                  "x": 37.92517,
+                  "y": 60.57029,
+                  "z": 336.16983
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_741qd7",
+                    "fromNodeTitle": "P1A - CP2",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_qw4zkw",
+                    "toNodeTitle": "Converge",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_qw4zkw"
+                ]
+              }
+            },
+            {
+              "id": "n_4wvi8s",
+              "index": 8,
+              "label": "P1B - CP2",
+              "runtimeLabel": "W1Z3 | P1B - CP2 | P1B-CP2",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P1B - CP2",
+                "x": 928,
+                "y": 400,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 8,
+                "checkpointLabel": "P1B-CP2",
+                "mapId": "34",
+                "position": {
+                  "x": -163.65572,
+                  "y": 27.81278,
+                  "z": 662.5968
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_flue57",
+                    "fromNodeTitle": "Path 1 Split",
+                    "fromSocketIndex": 1,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_ewrntp",
+                    "toNodeTitle": "P1B - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_ewrntp"
+                ]
+              }
+            },
+            {
+              "id": "n_ewrntp",
+              "index": 9,
+              "label": "P1B - CP3",
+              "runtimeLabel": "W1Z3 | P1B - CP3 | P1B-CP3",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P1B - CP3",
+                "x": 1415,
+                "y": 402,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 9,
+                "checkpointLabel": "P1B-CP3",
+                "mapId": "34",
+                "position": {
+                  "x": -244.63004,
+                  "y": 52.20128,
+                  "z": 467.1818
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_4wvi8s",
+                    "fromNodeTitle": "P1B - CP2",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_qw4zkw",
+                    "toNodeTitle": "Converge",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 1
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_qw4zkw"
+                ]
+              }
+            },
+            {
+              "id": "n_x01ipq",
+              "index": 10,
+              "label": "P1C - CP2",
+              "runtimeLabel": "W1Z3 | P1C - CP2 | P1C-CP2",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P1C - CP2",
+                "x": 936,
+                "y": 590,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 10,
+                "checkpointLabel": "P1C-CP2",
+                "mapId": "34",
+                "position": {
+                  "x": -346.47217,
+                  "y": 6.38764,
+                  "z": 680.4041
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_flue57",
+                    "fromNodeTitle": "Path 1 Split",
+                    "fromSocketIndex": 2,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_ipoeeq",
+                    "toNodeTitle": "P1C - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_ipoeeq"
+                ]
+              }
+            },
+            {
+              "id": "n_ipoeeq",
+              "index": 11,
+              "label": "P1C - CP3",
+              "runtimeLabel": "W1Z3 | P1C - CP3 | P1C-CP3",
+              "type": "checkpoint",
+              "planner": {
+                "title": "P1C - CP3",
+                "x": 1411,
+                "y": 597,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 11,
+                "checkpointLabel": "P1C-CP3",
+                "mapId": "34",
+                "position": {
+                  "x": -426.91647,
+                  "y": 37.42985,
+                  "z": 325.06244
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_x01ipq",
+                    "fromNodeTitle": "P1C - CP2",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_qw4zkw",
+                    "toNodeTitle": "Converge",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 2
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_qw4zkw"
+                ]
+              }
+            },
+            {
+              "id": "n_qw4zkw",
+              "index": 12,
+              "label": "Converge",
+              "runtimeLabel": "W1Z3 | Converge | CONVERGE",
+              "type": "converge",
+              "planner": {
+                "title": "Converge",
+                "x": 1988,
+                "y": 407,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 12,
+                "checkpointLabel": "CONVERGE",
+                "mapId": "34",
+                "position": {
+                  "x": 224.80879,
+                  "y": 1.82702,
+                  "z": -201.8497
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "converge"
+              },
+              "graph": {
+                "inputCount": 4,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_g0aykx",
+                    "fromNodeTitle": "P1A - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  },
+                  {
+                    "fromNodeId": "n_ewrntp",
+                    "fromNodeTitle": "P1B - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 1
+                  },
+                  {
+                    "fromNodeId": "n_ipoeeq",
+                    "fromNodeTitle": "P1C - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 2
+                  },
+                  {
+                    "fromNodeId": "n_wi689r",
+                    "fromNodeTitle": "P2 - CP3",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 3
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_z8udun",
+                    "toNodeTitle": "CP4",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_z8udun"
+                ]
+              }
+            },
+            {
+              "id": "n_z8udun",
+              "index": 13,
+              "label": "CP4",
+              "runtimeLabel": "W1Z3 | CP4 | CP 4",
+              "type": "checkpoint",
+              "planner": {
+                "title": "CP4",
+                "x": 2253,
+                "y": 409,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 13,
+                "checkpointLabel": "CP 4",
+                "mapId": "34",
+                "position": {
+                  "x": 351.26233,
+                  "y": 22.48518,
+                  "z": -425.88788
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "checkpoint"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 1,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_qw4zkw",
+                    "fromNodeTitle": "Converge",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [
+                  {
+                    "toNodeId": "n_gkhhok",
+                    "toNodeTitle": "W1-Z3 Boss",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "runtimeOutputNodeIds": [
+                  "n_gkhhok"
+                ]
+              }
+            },
+            {
+              "id": "n_gkhhok",
+              "index": 14,
+              "label": "W1-Z3 Boss",
+              "runtimeLabel": "W1Z3 | W1-Z3 Boss | END",
+              "type": "boss",
+              "planner": {
+                "title": "W1-Z3 Boss",
+                "x": 2529,
+                "y": 408,
+                "width": 170,
+                "height": 100
+              },
+              "binding": {
+                "isBound": true,
+                "ignoreNode": false,
+                "isEndOfRace": false,
+                "endOfRaceMode": null,
+                "outputOverrideNodeIds": []
+              },
+              "telemetry": {
+                "hasCheckpoint": true,
+                "step": 14,
+                "checkpointLabel": "END",
+                "mapId": "34",
+                "position": {
+                  "x": 472.50842,
+                  "y": 0.66594,
+                  "z": -711.5439
+                },
+                "trigger": {
+                  "radius": 15,
+                  "angle": 360
+                },
+                "note": "",
+                "checkpointType": "end"
+              },
+              "graph": {
+                "inputCount": 1,
+                "outputCount": 0,
+                "graphInputs": [
+                  {
+                    "fromNodeId": "n_z8udun",
+                    "fromNodeTitle": "CP4",
+                    "fromSocketIndex": 0,
+                    "toSocketIndex": 0
+                  }
+                ],
+                "graphOutputs": [],
+                "runtimeOutputNodeIds": []
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "side": "bottom",
+      "displayName": "",
+      "direction": "left-to-right",
+      "segmentCount": 0,
+      "segments": []
+    }
+  ]
+}

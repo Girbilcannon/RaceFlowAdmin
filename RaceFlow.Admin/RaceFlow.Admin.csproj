@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>Assets\RaceFlow.ico</ApplicationIcon>
+    <AssemblyName>RaceflowAdmin</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\RaceFlow.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RaceFlow.Core\RaceFlow.Core.csproj" />
+    <ProjectReference Include="..\RaceFlow.RuntimeHost\RaceFlow.RuntimeHost.csproj" />
+  </ItemGroup>
+
+</Project>
