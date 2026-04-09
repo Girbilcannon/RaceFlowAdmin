@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="RaceFlow.Admin/RaceFlow.Admin.csproj" Id="a69cb661-98fb-4f26-aa9d-3be21fd949fb" />
+  <Project Path="RaceFlow.Core/RaceFlow.Core.csproj" />
+  <Project Path="RaceFlow.RuntimeHost/RaceFlow.RuntimeHost.csproj" />
+</Solution>
