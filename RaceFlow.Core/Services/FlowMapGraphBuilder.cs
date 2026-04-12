@@ -44,6 +44,9 @@ public sealed class FlowMapGraphBuilder
                     Label = segment.Label,
                     Side = segment.Side,
                     Direction = segment.Direction,
+                    VisualScale = segment.VisualScale,
+                    OffsetX = segment.OffsetX,
+                    OffsetY = segment.OffsetY,
                     PewFileName = segment.PewFileName,
                     CheckpointFileName = segment.CheckpointFileName
                 };

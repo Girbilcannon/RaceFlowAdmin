@@ -19,6 +19,15 @@ public sealed class FlowMapSegment
     [JsonPropertyName("direction")]
     public string Direction { get; set; } = string.Empty;
 
+    [JsonPropertyName("visualScale")]
+    public float VisualScale { get; set; } = 1.0f;
+
+    [JsonPropertyName("offsetX")]
+    public float OffsetX { get; set; } = 0f;
+
+    [JsonPropertyName("offsetY")]
+    public float OffsetY { get; set; } = 0f;
+
     [JsonPropertyName("pewFileName")]
     public string PewFileName { get; set; } = string.Empty;
 

@@ -50,9 +50,25 @@ namespace RaceFlow.Admin
             _listenTask = Task.Run(() => ListenLoopAsync(_cts.Token));
         }
 
-        public void UpdateScene(RuntimeGraph? graph, RaceOutputFrame? frame, string? themeFile)
+        public void UpdateScene(
+            RuntimeGraph? graph,
+            RaceOutputFrame? frame,
+            string? themeFile,
+            float outputScale = 1.0f,
+            float outputOffsetX = 0f,
+            float outputOffsetY = 0f,
+            float outputNodeTextScale = 1.0f,
+            float outputRacerTextScale = 1.0f)
         {
-            var payload = BuildPayload(graph, frame, themeFile);
+            var payload = BuildPayload(
+                graph,
+                frame,
+                themeFile,
+                outputScale,
+                outputOffsetX,
+                outputOffsetY,
+                outputNodeTextScale,
+                outputRacerTextScale);
 
             lock (_sync)
             {
@@ -198,11 +214,24 @@ namespace RaceFlow.Admin
             await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
         }
 
-        private static OverlayPayload BuildPayload(RuntimeGraph? graph, RaceOutputFrame? frame, string? themeFile)
+        private static OverlayPayload BuildPayload(
+            RuntimeGraph? graph,
+            RaceOutputFrame? frame,
+            string? themeFile,
+            float outputScale,
+            float outputOffsetX,
+            float outputOffsetY,
+            float outputNodeTextScale,
+            float outputRacerTextScale)
         {
             var payload = new OverlayPayload
             {
-                ThemeFile = themeFile
+                ThemeFile = themeFile,
+                OutputScale = outputScale,
+                OutputOffsetX = outputOffsetX,
+                OutputOffsetY = outputOffsetY,
+                OutputNodeTextScale = outputNodeTextScale,
+                OutputRacerTextScale = outputRacerTextScale
             };
 
             if (graph != null)
@@ -234,7 +263,10 @@ namespace RaceFlow.Admin
                         Side = segment.Side,
                         Direction = segment.Direction,
                         PewFileName = segment.PewFileName,
-                        CheckpointFileName = segment.CheckpointFileName
+                        CheckpointFileName = segment.CheckpointFileName,
+                        VisualScale = segment.VisualScale,
+                        OffsetX = segment.OffsetX,
+                        OffsetY = segment.OffsetY
                     });
                 }
 
@@ -411,6 +443,14 @@ async function loadTheme(themeFile) {
             }
         }
 
+        if (currentTheme.nodeTypeOverrides) {
+            for (const key in currentTheme.nodeTypeOverrides) {
+                const o = currentTheme.nodeTypeOverrides[key];
+                if (o && o.image)
+                    queueImage(o.image);
+            }
+        }
+
         if (currentTheme.segmentOverrides) {
             for (const key in currentTheme.segmentOverrides) {
                 const o = currentTheme.segmentOverrides[key];
@@ -472,9 +512,27 @@ function draw() {
         return;
     }
 
+    ctx.save();
+    applyGlobalOutputTransform(width, height);
+
     drawEdges(latestData, nodeMap, segmentLayouts);
     drawNodes(latestData, segmentLayouts);
     drawRacers(latestData, nodeMap, segmentLayouts);
+
+    ctx.restore();
+}
+
+function applyGlobalOutputTransform(width, height) {
+    const scale = Math.max(0.05, toNumber(latestData?.outputScale, 1.0));
+    const offsetX = toNumber(latestData?.outputOffsetX, 0);
+    const offsetY = toNumber(latestData?.outputOffsetY, 0);
+
+    const centerX = width * 0.5;
+    const centerY = height * 0.5;
+
+    ctx.translate(centerX + offsetX, centerY + offsetY);
+    ctx.scale(scale, scale);
+    ctx.translate(-centerX, -centerY);
 }
 
 function drawCenteredMessage(message) {
@@ -552,6 +610,8 @@ function buildSegmentLayouts(data, sideRegions) {
         if (sectionSegments.length === 0)
             continue;
 
+        const sectionLayouts = [];
+
         for (let i = 0; i < sectionSegments.length; i++) {
             const segment = sectionSegments[i];
 
@@ -566,11 +626,63 @@ function buildSegmentLayouts(data, sideRegions) {
             const sourceBounds = getTransformedSourceBounds(segmentNodes, side, effectiveDirection);
             const targetRect = getSegmentTargetRect(sideRect, side, effectiveDirection, i, sectionSegments.length);
 
-            result[segment.id] = new SegmentLayout(section, side, effectiveDirection, targetRect, sourceBounds);
+            const layout = new SegmentLayout(section, segment, side, effectiveDirection, targetRect, sourceBounds);
+            sectionLayouts.push({ segment, segmentNodes, layout });
+        }
+
+        if (sectionLayouts.length === 0)
+            continue;
+
+        const sectionBounds = computeSectionBounds(sectionLayouts);
+        const centerX = sectionBounds.left + (sectionBounds.width * 0.5);
+        const centerY = sectionBounds.top + (sectionBounds.height * 0.5);
+        const sectionScale = Math.max(0.05, toNumber(section.visualScale, 1.0));
+        const sectionOffsetX = toNumber(section.offsetX, 0);
+        const sectionOffsetY = toNumber(section.offsetY, 0);
+
+        for (const item of sectionLayouts) {
+            item.layout.setSectionTransform(centerX, centerY, sectionScale, sectionOffsetX, sectionOffsetY);
+            result[item.segment.id] = item.layout;
         }
     }
 
     return result;
+}
+
+function computeSectionBounds(sectionLayouts) {
+    let hasPoint = false;
+    let minX = 0;
+    let minY = 0;
+    let maxX = 0;
+    let maxY = 0;
+
+    for (const item of sectionLayouts) {
+        for (const node of item.segmentNodes) {
+            const p = item.layout.transformBase(node);
+
+            if (!hasPoint) {
+                minX = maxX = p.x;
+                minY = maxY = p.y;
+                hasPoint = true;
+            } else {
+                if (p.x < minX) minX = p.x;
+                if (p.y < minY) minY = p.y;
+                if (p.x > maxX) maxX = p.x;
+                if (p.y > maxY) maxY = p.y;
+            }
+        }
+    }
+
+    if (!hasPoint) {
+        return { left: 0, top: 0, width: 1, height: 1 };
+    }
+
+    return {
+        left: minX,
+        top: minY,
+        width: Math.max(1, maxX - minX),
+        height: Math.max(1, maxY - minY)
+    };
 }
 
 function getEffectiveDirection(sectionDirection, segmentDirection, side) {
@@ -775,8 +887,10 @@ function drawNodes(data, segmentLayouts) {
         const p = transformNode(node, segmentLayouts);
         const nodeStyle = getResolvedNodeStyle(node);
         const size = nodeStyle.size;
-        const left = p.x - (size * 0.5);
-        const top = p.y - (size * 0.5);
+
+        const left = p.x - (size * 0.5) + nodeStyle.imageOffsetX;
+        const top = p.y - (size * 0.5) + nodeStyle.imageOffsetY;
+
         const img = nodeStyle.imageFile ? imageCache[nodeStyle.imageFile] : null;
 
         ctx.save();
@@ -793,23 +907,25 @@ function drawNodes(data, segmentLayouts) {
                 ctx.strokeRect(left, top, size, size);
             } else {
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, size * 0.5, 0, Math.PI * 2);
+                ctx.arc(left + (size * 0.5), top + (size * 0.5), size * 0.5, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.strokeStyle = "rgba(230,240,250,1)";
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, size * 0.5, 0, Math.PI * 2);
+                ctx.arc(left + (size * 0.5), top + (size * 0.5), size * 0.5, 0, Math.PI * 2);
                 ctx.stroke();
             }
         }
 
         if (nodeStyle.titleVisible) {
             ctx.fillStyle = "rgba(255,255,255,1)";
-            ctx.font = `bold ${Math.max(8, 9 * nodeStyle.titleScale)}px Segoe UI`;
+            const outputNodeTextScale = Math.max(0.05, toNumber(latestData?.outputNodeTextScale, 1.0));
+            const finalTitleScale = Math.max(0.05, nodeStyle.titleScale * outputNodeTextScale);
+            ctx.font = `bold ${Math.max(8, 9 * finalTitleScale)}px Segoe UI`;
             ctx.textAlign = "center";
             ctx.textBaseline = "top";
-            ctx.fillText(node.label || "", p.x + nodeStyle.titleOffsetX, p.y + (size * 0.5) + 4 + nodeStyle.titleOffsetY);
+            ctx.fillText(node.label || "", p.x + nodeStyle.titleOffsetX, p.y + (size * 0.5) + nodeStyle.titleOffsetY);
         }
 
         ctx.restore();
@@ -859,7 +975,8 @@ function drawRacers(data, nodeMap, segmentLayouts) {
         ctx.stroke();
 
         if (nameVisible) {
-            ctx.font = `bold ${Math.max(1, 8.5 * nameScale)}px Segoe UI`;
+            const outputRacerTextScale = Math.max(0.05, toNumber(latestData?.outputRacerTextScale, 1.0));
+            ctx.font = `bold ${Math.max(1, 8.5 * nameScale * outputRacerTextScale)}px Segoe UI`;
             ctx.textAlign = "left";
             ctx.textBaseline = "top";
             ctx.fillStyle = "rgba(255,255,255,1)";
@@ -905,19 +1022,36 @@ function transformNode(node, segmentLayouts) {
 function getResolvedNodeStyle(node) {
     const settings = currentTheme?.settings || {};
     const segmentOverride = getSegmentOverride(node.segmentId);
+    const nodeTypeOverride = getNodeTypeOverride(node.nodeType);
     const nodeOverride = getNodeOverride(node.id);
 
     const baseScale = toNumber(settings.nodeScale, 1.0);
-    const segmentScale = segmentOverride && segmentOverride.nodeScale !== undefined ? toNumber(segmentOverride.nodeScale, 1.0) : 1.0;
-    const overrideScale = nodeOverride && nodeOverride.scale !== undefined ? toNumber(nodeOverride.scale, 1.0) : 1.0;
+    const nodeTypeScale = nodeTypeOverride && nodeTypeOverride.scale !== undefined
+        ? toNumber(nodeTypeOverride.scale, 1.0)
+        : 1.0;
+    const segmentScale = segmentOverride && segmentOverride.nodeScale !== undefined
+        ? toNumber(segmentOverride.nodeScale, 1.0)
+        : 1.0;
+    const overrideScale = nodeOverride && nodeOverride.scale !== undefined
+        ? toNumber(nodeOverride.scale, 1.0)
+        : 1.0;
 
-    const size = getBaseNodeSize(node) * baseScale * segmentScale * overrideScale;
+    let size = getBaseNodeSize(node) * baseScale;
+    size *= nodeTypeScale;
+
+    if (segmentOverride && segmentOverride.nodeScale !== undefined)
+        size = getBaseNodeSize(node) * baseScale * segmentScale;
+
+    if (nodeOverride && nodeOverride.scale !== undefined)
+        size = getBaseNodeSize(node) * baseScale * overrideScale;
 
     let imageFile = null;
     if (nodeOverride && nodeOverride.image)
         imageFile = nodeOverride.image;
     else if (segmentOverride && segmentOverride.nodeImage)
         imageFile = segmentOverride.nodeImage;
+    else if (nodeTypeOverride && nodeTypeOverride.image)
+        imageFile = nodeTypeOverride.image;
     else if (currentTheme?.nodes?.[node.nodeType])
         imageFile = currentTheme.nodes[node.nodeType];
     else if (currentTheme?.nodes?.checkpoint)
@@ -926,28 +1060,37 @@ function getResolvedNodeStyle(node) {
     const globalTitleVisible = settings.titleVisible !== false;
     let titleVisible = globalTitleVisible;
 
+    if (nodeTypeOverride && nodeTypeOverride.titleVisible !== undefined)
+        titleVisible = Boolean(nodeTypeOverride.titleVisible);
     if (segmentOverride && segmentOverride.titleVisible !== undefined)
         titleVisible = Boolean(segmentOverride.titleVisible);
     if (nodeOverride && nodeOverride.titleVisible !== undefined)
         titleVisible = Boolean(nodeOverride.titleVisible);
 
-    const titleScale = nodeOverride && nodeOverride.titleScale !== undefined
-        ? toNumber(nodeOverride.titleScale, 1.0)
-        : (segmentOverride && segmentOverride.titleScale !== undefined
-            ? toNumber(segmentOverride.titleScale, 1.0)
-            : toNumber(settings.titleScale, 1.0));
+    const titleScale =
+        nodeOverride && nodeOverride.titleScale !== undefined
+            ? toNumber(nodeOverride.titleScale, toNumber(settings.titleScale, 1.0))
+            : nodeTypeOverride && nodeTypeOverride.titleScale !== undefined
+                ? toNumber(nodeTypeOverride.titleScale, toNumber(settings.titleScale, 1.0))
+                : toNumber(settings.titleScale, 1.0);
 
-    const titleOffsetX = nodeOverride && nodeOverride.titleOffsetX !== undefined
-        ? toNumber(nodeOverride.titleOffsetX, 0)
-        : (segmentOverride && segmentOverride.titleOffsetX !== undefined
-            ? toNumber(segmentOverride.titleOffsetX, 0)
-            : toNumber(settings.titleOffsetX, 0));
+    const titleOffsetX =
+        toNumber(settings.titleOffsetX, 0) +
+        (nodeTypeOverride && nodeTypeOverride.titleOffsetX !== undefined ? toNumber(nodeTypeOverride.titleOffsetX, 0) : 0) +
+        (nodeOverride && nodeOverride.titleOffsetX !== undefined ? toNumber(nodeOverride.titleOffsetX, 0) : 0);
 
-    const titleOffsetY = nodeOverride && nodeOverride.titleOffsetY !== undefined
-        ? toNumber(nodeOverride.titleOffsetY, 0)
-        : (segmentOverride && segmentOverride.titleOffsetY !== undefined
-            ? toNumber(segmentOverride.titleOffsetY, 0)
-            : toNumber(settings.titleOffsetY, 0));
+    const titleOffsetY =
+        toNumber(settings.titleOffsetY, 0) +
+        (nodeTypeOverride && nodeTypeOverride.titleOffsetY !== undefined ? toNumber(nodeTypeOverride.titleOffsetY, 0) : 0) +
+        (nodeOverride && nodeOverride.titleOffsetY !== undefined ? toNumber(nodeOverride.titleOffsetY, 0) : 0);
+
+    const imageOffsetX =
+        (nodeTypeOverride && nodeTypeOverride.imageOffsetX !== undefined ? toNumber(nodeTypeOverride.imageOffsetX, 0) : 0) +
+        (nodeOverride && nodeOverride.imageOffsetX !== undefined ? toNumber(nodeOverride.imageOffsetX, 0) : 0);
+
+    const imageOffsetY =
+        (nodeTypeOverride && nodeTypeOverride.imageOffsetY !== undefined ? toNumber(nodeTypeOverride.imageOffsetY, 0) : 0) +
+        (nodeOverride && nodeOverride.imageOffsetY !== undefined ? toNumber(nodeOverride.imageOffsetY, 0) : 0);
 
     let color = getNodeColor(node);
     if (nodeOverride && nodeOverride.tintColor)
@@ -962,7 +1105,9 @@ function getResolvedNodeStyle(node) {
         titleVisible,
         titleScale,
         titleOffsetX,
-        titleOffsetY
+        titleOffsetY,
+        imageOffsetX,
+        imageOffsetY
     };
 }
 
@@ -981,8 +1126,12 @@ function getResolvedLineStyle(fromNode, toNode) {
     let thickness = toNumber(currentTheme?.lines?.thickness, 3);
     thickness *= toNumber(settings.lineScale, 1.0);
 
-    if (segmentOverride && segmentOverride.lineThickness !== undefined)
-        thickness = toNumber(segmentOverride.lineThickness, thickness);
+    if (segmentOverride) {
+        if (segmentOverride.lineThickness !== undefined)
+            thickness = toNumber(segmentOverride.lineThickness, thickness);
+        else if (segmentOverride.thickness !== undefined)
+            thickness = toNumber(segmentOverride.thickness, thickness);
+    }
 
     let imageFile = null;
     if (segmentOverride && segmentOverride.lineImage)
@@ -1013,6 +1162,12 @@ function getNodeOverride(nodeId) {
     if (!currentTheme || !currentTheme.nodeOverrides || !nodeId)
         return null;
     return currentTheme.nodeOverrides[nodeId] || null;
+}
+
+function getNodeTypeOverride(nodeType) {
+    if (!currentTheme || !currentTheme.nodeTypeOverrides || !nodeType)
+        return null;
+    return currentTheme.nodeTypeOverrides[nodeType] || null;
 }
 
 function getSegmentOverride(segmentId) {
@@ -1189,8 +1344,9 @@ function toNumber(value, fallback) {
 }
 
 class SegmentLayout {
-    constructor(section, side, direction, targetRect, sourceBounds) {
+    constructor(section, segment, side, direction, targetRect, sourceBounds) {
         this.section = section;
+        this.segment = segment;
         this.side = side;
         this.direction = direction;
         this.targetRect = targetRect;
@@ -1202,34 +1358,76 @@ class SegmentLayout {
         const scaleX = usableWidth / Math.max(1, sourceBounds.width);
         const scaleY = usableHeight / Math.max(1, sourceBounds.height);
 
-        const baseScale = Math.min(scaleX, scaleY);
+        this.baseScale = Math.min(scaleX, scaleY);
 
-        this.scale = baseScale * Number(section.visualScale ?? 1.0);
+        const scaledWidth = sourceBounds.width * this.baseScale;
+        const scaledHeight = sourceBounds.height * this.baseScale;
 
-        const scaledWidth = sourceBounds.width * this.scale;
-        const scaledHeight = sourceBounds.height * this.scale;
-
-        this.offsetX =
+        this.baseOffsetX =
             targetRect.left +
             ((targetRect.width - scaledWidth) * 0.5) -
-            (sourceBounds.left * this.scale) +
-            Number(section.offsetX ?? 0);
+            (sourceBounds.left * this.baseScale);
 
-        this.offsetY =
+        this.baseOffsetY =
             targetRect.top +
             ((targetRect.height - scaledHeight) * 0.5) -
-            (sourceBounds.top * this.scale) +
-            Number(section.offsetY ?? 0);
+            (sourceBounds.top * this.baseScale);
+
+        this.sectionCenterX = 0;
+        this.sectionCenterY = 0;
+        this.sectionScale = 1.0;
+        this.sectionOffsetX = 0;
+        this.sectionOffsetY = 0;
     }
 
-    transform(node) {
+    setSectionTransform(centerX, centerY, sectionScale, sectionOffsetX, sectionOffsetY) {
+        this.sectionCenterX = centerX;
+        this.sectionCenterY = centerY;
+        this.sectionScale = Math.max(0.05, sectionScale);
+        this.sectionOffsetX = sectionOffsetX;
+        this.sectionOffsetY = sectionOffsetY;
+    }
+
+    transformBase(node) {
         let point = transformRawPoint(Number(node.overlayX || 0), Number(node.overlayY || 0), this.side);
         point = applyDirectionFlip(point, this.sourceBounds, this.side, this.direction);
 
-        return {
-            x: (point.x * this.scale) + this.offsetX,
-            y: (point.y * this.scale) + this.offsetY
+        const baseX = (point.x * this.baseScale) + this.baseOffsetX;
+        const baseY = (point.y * this.baseScale) + this.baseOffsetY;
+
+        const sectionX =
+            this.sectionCenterX +
+            ((baseX - this.sectionCenterX) * this.sectionScale) +
+            this.sectionOffsetX;
+
+        const sectionY =
+            this.sectionCenterY +
+            ((baseY - this.sectionCenterY) * this.sectionScale) +
+            this.sectionOffsetY;
+
+        return { x: sectionX, y: sectionY };
+    }
+
+    transform(node) {
+        let p = this.transformBase(node);
+
+        p = {
+            x: p.x + toNumber(this.segment.offsetX, 0),
+            y: p.y + toNumber(this.segment.offsetY, 0)
         };
+
+        const segmentScale = Math.max(0.05, toNumber(this.segment.visualScale, 1.0));
+        if (Math.abs(segmentScale - 1.0) > 0.0001) {
+            const centerX = this.targetRect.left + (this.targetRect.width * 0.5) + this.sectionOffsetX;
+            const centerY = this.targetRect.top + (this.targetRect.height * 0.5) + this.sectionOffsetY;
+
+            p = {
+                x: centerX + ((p.x - centerX) * segmentScale),
+                y: centerY + ((p.y - centerY) * segmentScale)
+            };
+        }
+
+        return p;
     }
 }
 </script>
@@ -1284,6 +1482,12 @@ class SegmentLayout {
             public DateTime ExportedAtUtc { get; set; }
             public DateTime CapturedUtc { get; set; }
 
+            public float OutputScale { get; set; } = 1.0f;
+            public float OutputOffsetX { get; set; } = 0f;
+            public float OutputOffsetY { get; set; } = 0f;
+            public float OutputNodeTextScale { get; set; } = 1.0f;
+            public float OutputRacerTextScale { get; set; } = 1.0f;
+
             public List<OverlaySectionPayload> Sections { get; } = new();
             public List<OverlaySegmentPayload> Segments { get; } = new();
             public List<OverlayNodePayload> Nodes { get; } = new();
@@ -1310,6 +1514,9 @@ class SegmentLayout {
             public string Direction { get; set; } = string.Empty;
             public string PewFileName { get; set; } = string.Empty;
             public string CheckpointFileName { get; set; } = string.Empty;
+            public float VisualScale { get; set; } = 1.0f;
+            public float OffsetX { get; set; }
+            public float OffsetY { get; set; }
         }
 
         private sealed class OverlayNodePayload

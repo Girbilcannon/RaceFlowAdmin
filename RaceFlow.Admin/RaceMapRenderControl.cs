@@ -20,6 +20,12 @@ namespace RaceFlow.Admin
         private ThemeSettings? _themeSettings;
         private readonly Dictionary<string, Image> _imageCache = new(StringComparer.OrdinalIgnoreCase);
 
+        private float _outputScale = 1.0f;
+        private float _outputOffsetX = 0f;
+        private float _outputOffsetY = 0f;
+        private float _outputNodeTextScale = 1.0f;
+        private float _outputRacerTextScale = 1.0f;
+
         public RaceMapRenderControl()
         {
             SetStyle(
@@ -44,12 +50,27 @@ namespace RaceFlow.Admin
             base.Dispose(disposing);
         }
 
-        public void UpdateScene(RuntimeGraph? graph, RaceOutputFrame? frame, string? themeFile = null)
+        public void UpdateScene(
+            RuntimeGraph? graph,
+            RaceOutputFrame? frame,
+            string? themeFile = null,
+            float outputScale = 1.0f,
+            float outputOffsetX = 0f,
+            float outputOffsetY = 0f,
+            float outputNodeTextScale = 1.0f,
+            float outputRacerTextScale = 1.0f)
         {
             _graph = graph;
             _frame = frame;
             _themeFile = themeFile;
             _themeSettings = LoadThemeSettings(themeFile);
+
+            _outputScale = Math.Max(0.05f, outputScale);
+            _outputOffsetX = outputOffsetX;
+            _outputOffsetY = outputOffsetY;
+            _outputNodeTextScale = Math.Max(0.05f, outputNodeTextScale);
+            _outputRacerTextScale = Math.Max(0.05f, outputRacerTextScale);
+
             Invalidate();
         }
 
@@ -71,26 +92,54 @@ namespace RaceFlow.Admin
                 return;
             }
 
-            Dictionary<FlowSide, RectangleF> sideRegions = BuildSideRegions(client);
-            Dictionary<string, SegmentLayout> segmentLayouts = BuildSegmentLayouts(_graph, sideRegions);
+            GraphicsState state = g.Save();
 
-            if (segmentLayouts.Count == 0)
+            try
             {
-                DrawCenteredMessage(g, client, "Flow has no drawable segments.");
-                return;
-            }
+                ApplyGlobalOutputTransform(g, client, _outputScale, _outputOffsetX, _outputOffsetY);
 
-            PointF Transform(RuntimeNode node)
+                Dictionary<FlowSide, RectangleF> sideRegions = BuildSideRegions(client);
+                Dictionary<string, SegmentLayout> segmentLayouts = BuildSegmentLayouts(_graph, sideRegions);
+
+                if (segmentLayouts.Count == 0)
+                {
+                    DrawCenteredMessage(g, client, "Flow has no drawable segments.");
+                    return;
+                }
+
+                PointF Transform(RuntimeNode node)
+                {
+                    if (segmentLayouts.TryGetValue(node.SegmentId, out SegmentLayout? layout))
+                        return layout.Transform(node);
+
+                    return new PointF(0f, 0f);
+                }
+
+                DrawEdges(g, _graph, Transform, _themeSettings);
+                DrawNodes(g, _graph, Transform, _themeSettings, _imageCache, _outputNodeTextScale);
+                DrawRacers(g, _graph, _frame, Transform, _themeSettings, _outputRacerTextScale);
+            }
+            finally
             {
-                if (segmentLayouts.TryGetValue(node.SegmentId, out SegmentLayout? layout))
-                    return layout.Transform(node);
-
-                return new PointF(0f, 0f);
+                g.Restore(state);
             }
+        }
 
-            DrawEdges(g, _graph, Transform, _themeSettings);
-            DrawNodes(g, _graph, Transform, _themeSettings, _imageCache);
-            DrawRacers(g, _graph, _frame, Transform, _themeSettings);
+        private static void ApplyGlobalOutputTransform(
+            Graphics g,
+            Rectangle client,
+            float outputScale,
+            float outputOffsetX,
+            float outputOffsetY)
+        {
+            float safeScale = Math.Max(0.05f, outputScale);
+
+            float centerX = client.Left + (client.Width * 0.5f);
+            float centerY = client.Top + (client.Height * 0.5f);
+
+            g.TranslateTransform(centerX + outputOffsetX, centerY + outputOffsetY);
+            g.ScaleTransform(safeScale, safeScale);
+            g.TranslateTransform(-centerX, -centerY);
         }
 
         private static Dictionary<FlowSide, RectangleF> BuildSideRegions(Rectangle client)
@@ -138,6 +187,8 @@ namespace RaceFlow.Admin
                 if (sectionSegments.Count == 0)
                     continue;
 
+                var sectionLayouts = new List<(RuntimeSegment Segment, List<RuntimeNode> Nodes, SegmentLayout Layout)>();
+
                 for (int i = 0; i < sectionSegments.Count; i++)
                 {
                     RuntimeSegment segment = sectionSegments[i];
@@ -154,11 +205,64 @@ namespace RaceFlow.Admin
                     RectangleF sourceBounds = GetTransformedSourceBounds(segmentNodes, side, effectiveDirection);
                     RectangleF targetRect = GetSegmentTargetRect(sideRect, side, effectiveDirection, i, sectionSegments.Count);
 
-                    result[segment.Id] = new SegmentLayout(section, side, effectiveDirection, targetRect, sourceBounds);
+                    var layout = new SegmentLayout(section, segment, side, effectiveDirection, targetRect, sourceBounds);
+                    sectionLayouts.Add((segment, segmentNodes, layout));
+                }
+
+                if (sectionLayouts.Count == 0)
+                    continue;
+
+                RectangleF sectionBounds = ComputeSectionBounds(sectionLayouts);
+
+                float centerX = sectionBounds.Left + (sectionBounds.Width * 0.5f);
+                float centerY = sectionBounds.Top + (sectionBounds.Height * 0.5f);
+                float sectionScale = Math.Max(0.05f, section.VisualScale);
+
+                foreach (var item in sectionLayouts)
+                {
+                    item.Layout.SetSectionTransform(centerX, centerY, sectionScale, section.OffsetX, section.OffsetY);
+                    result[item.Segment.Id] = item.Layout;
                 }
             }
 
             return result;
+        }
+
+        private static RectangleF ComputeSectionBounds(
+            List<(RuntimeSegment Segment, List<RuntimeNode> Nodes, SegmentLayout Layout)> sectionLayouts)
+        {
+            bool hasPoint = false;
+            float minX = 0f;
+            float minY = 0f;
+            float maxX = 0f;
+            float maxY = 0f;
+
+            foreach (var item in sectionLayouts)
+            {
+                foreach (RuntimeNode node in item.Nodes)
+                {
+                    PointF p = item.Layout.TransformBase(node);
+
+                    if (!hasPoint)
+                    {
+                        minX = maxX = p.X;
+                        minY = maxY = p.Y;
+                        hasPoint = true;
+                    }
+                    else
+                    {
+                        if (p.X < minX) minX = p.X;
+                        if (p.Y < minY) minY = p.Y;
+                        if (p.X > maxX) maxX = p.X;
+                        if (p.Y > maxY) maxY = p.Y;
+                    }
+                }
+            }
+
+            if (!hasPoint)
+                return new RectangleF(0f, 0f, 1f, 1f);
+
+            return new RectangleF(minX, minY, Math.Max(1f, maxX - minX), Math.Max(1f, maxY - minY));
         }
 
         private static string GetEffectiveDirection(string? sectionDirection, string? segmentDirection, FlowSide side)
@@ -323,16 +427,11 @@ namespace RaceFlow.Admin
             RuntimeGraph graph,
             Func<RuntimeNode, PointF> transform,
             ThemeSettings? theme,
-            Dictionary<string, Image> imageCache)
+            Dictionary<string, Image> imageCache,
+            float outputNodeTextScale)
         {
             if (theme?.Settings.NodeVisibility == false)
                 return;
-
-            float titleScale = theme?.Settings.TitleScale ?? 1f;
-            float titleOffsetX = theme?.Settings.TitleOffsetX ?? 0f;
-            float titleOffsetY = theme?.Settings.TitleOffsetY ?? -40f;
-            using var labelFont = new Font("Segoe UI", Math.Max(6f, 9f * titleScale), FontStyle.Bold);
-            using var labelBrush = new SolidBrush(Color.White);
 
             foreach (RuntimeNode node in graph.Nodes.OrderBy(n => n.Index))
             {
@@ -343,7 +442,11 @@ namespace RaceFlow.Admin
                     continue;
 
                 float size = GetNodeSize(node, theme, visual);
-                RectangleF rect = new RectangleF(p.X - (size * 0.5f), p.Y - (size * 0.5f), size, size);
+
+                float imageLeft = p.X - (size * 0.5f) + visual.ImageOffsetX;
+                float imageTop = p.Y - (size * 0.5f) + visual.ImageOffsetY;
+
+                RectangleF rect = new RectangleF(imageLeft, imageTop, size, size);
 
                 bool drewImage = false;
                 Image? nodeImage = TryGetThemeImage(theme, visual.Image, imageCache);
@@ -372,9 +475,19 @@ namespace RaceFlow.Admin
 
                 if (visual.TitleVisible)
                 {
+                    float finalTitleScale = Math.Max(0.05f, visual.TitleScale * Math.Max(0.05f, outputNodeTextScale));
+                    float finalTitleFontSize = Math.Max(6f, 9f * finalTitleScale);
+
+                    using var labelFont = new Font("Segoe UI", finalTitleFontSize, FontStyle.Bold);
+                    using var labelBrush = new SolidBrush(Color.White);
+
                     string label = node.Label;
                     SizeF labelSize = g.MeasureString(label, labelFont);
-                    g.DrawString(label, labelFont, labelBrush, p.X - (labelSize.Width * 0.5f) + titleOffsetX, p.Y + titleOffsetY + (size * 0.5f));
+
+                    float textX = p.X - (labelSize.Width * 0.5f) + visual.TitleOffsetX;
+                    float textY = p.Y + (size * 0.5f) + visual.TitleOffsetY;
+
+                    g.DrawString(label, labelFont, labelBrush, textX, textY);
                 }
             }
         }
@@ -384,7 +497,8 @@ namespace RaceFlow.Admin
             RuntimeGraph graph,
             RaceOutputFrame? frame,
             Func<RuntimeNode, PointF> transform,
-            ThemeSettings? theme)
+            ThemeSettings? theme,
+            float outputRacerTextScale)
         {
             if (frame == null || frame.Racers.Count == 0)
                 return;
@@ -394,7 +508,7 @@ namespace RaceFlow.Admin
             float activeDotSize = Math.Max(2f, racerSettings.DotSize);
             float inactiveDotSize = Math.Max(2f, racerSettings.InactiveDotSize);
             float glowScale = Math.Max(1f, racerSettings.GlowScale);
-            float nameSize = Math.Max(1f, 8.5f * racerSettings.NameScale);
+            float nameSize = Math.Max(1f, 8.5f * racerSettings.NameScale * Math.Max(0.05f, outputRacerTextScale));
             float nameOffsetX = racerSettings.NameOffsetX;
             float nameOffsetY = racerSettings.NameOffsetY;
 
@@ -497,11 +611,9 @@ namespace RaceFlow.Admin
                 string json = File.ReadAllText(themePath);
                 using JsonDocument doc = JsonDocument.Parse(json);
 
-                ThemeSettings settings = new
-                (
+                ThemeSettings settings = new(
                     themeFile,
-                    Path.Combine(themesRoot, Path.GetFileNameWithoutExtension(themeFile))
-                );
+                    Path.Combine(themesRoot, Path.GetFileNameWithoutExtension(themeFile)));
 
                 if (doc.RootElement.TryGetProperty("nodes", out JsonElement nodes) && nodes.ValueKind == JsonValueKind.Object)
                 {
@@ -592,6 +704,35 @@ namespace RaceFlow.Admin
                     }
                 }
 
+                if (doc.RootElement.TryGetProperty("nodeTypeOverrides", out JsonElement nodeTypeOverrides) && nodeTypeOverrides.ValueKind == JsonValueKind.Object)
+                {
+                    foreach (JsonProperty property in nodeTypeOverrides.EnumerateObject())
+                    {
+                        NodeTypeOverride nodeTypeOverride = new();
+                        JsonElement value = property.Value;
+
+                        if (value.TryGetProperty("image", out JsonElement image) && image.ValueKind == JsonValueKind.String)
+                            nodeTypeOverride.Image = image.GetString();
+                        if (value.TryGetProperty("scale", out JsonElement scale) && scale.ValueKind == JsonValueKind.Number)
+                            nodeTypeOverride.Scale = (float)scale.GetDouble();
+                        if (value.TryGetProperty("titleVisible", out JsonElement titleVisible) &&
+                            (titleVisible.ValueKind == JsonValueKind.True || titleVisible.ValueKind == JsonValueKind.False))
+                            nodeTypeOverride.TitleVisible = titleVisible.GetBoolean();
+                        if (value.TryGetProperty("imageOffsetX", out JsonElement imageOffsetX) && imageOffsetX.ValueKind == JsonValueKind.Number)
+                            nodeTypeOverride.ImageOffsetX = (float)imageOffsetX.GetDouble();
+                        if (value.TryGetProperty("imageOffsetY", out JsonElement imageOffsetY) && imageOffsetY.ValueKind == JsonValueKind.Number)
+                            nodeTypeOverride.ImageOffsetY = (float)imageOffsetY.GetDouble();
+                        if (value.TryGetProperty("titleOffsetX", out JsonElement titleOffsetX) && titleOffsetX.ValueKind == JsonValueKind.Number)
+                            nodeTypeOverride.TitleOffsetX = (float)titleOffsetX.GetDouble();
+                        if (value.TryGetProperty("titleOffsetY", out JsonElement titleOffsetY) && titleOffsetY.ValueKind == JsonValueKind.Number)
+                            nodeTypeOverride.TitleOffsetY = (float)titleOffsetY.GetDouble();
+                        if (value.TryGetProperty("titleScale", out JsonElement titleScale) && titleScale.ValueKind == JsonValueKind.Number)
+                            nodeTypeOverride.TitleScale = (float)titleScale.GetDouble();
+
+                        settings.NodeTypeOverrides[property.Name] = nodeTypeOverride;
+                    }
+                }
+
                 if (doc.RootElement.TryGetProperty("nodeOverrides", out JsonElement nodeOverrides) && nodeOverrides.ValueKind == JsonValueKind.Object)
                 {
                     foreach (JsonProperty property in nodeOverrides.EnumerateObject())
@@ -605,6 +746,16 @@ namespace RaceFlow.Admin
                             nodeOverride.Scale = (float)scale.GetDouble();
                         if (value.TryGetProperty("titleVisible", out JsonElement titleVisible) && (titleVisible.ValueKind == JsonValueKind.True || titleVisible.ValueKind == JsonValueKind.False))
                             nodeOverride.TitleVisible = titleVisible.GetBoolean();
+                        if (value.TryGetProperty("imageOffsetX", out JsonElement imageOffsetX) && imageOffsetX.ValueKind == JsonValueKind.Number)
+                            nodeOverride.ImageOffsetX = (float)imageOffsetX.GetDouble();
+                        if (value.TryGetProperty("imageOffsetY", out JsonElement imageOffsetY) && imageOffsetY.ValueKind == JsonValueKind.Number)
+                            nodeOverride.ImageOffsetY = (float)imageOffsetY.GetDouble();
+                        if (value.TryGetProperty("titleOffsetX", out JsonElement titleOffsetX) && titleOffsetX.ValueKind == JsonValueKind.Number)
+                            nodeOverride.TitleOffsetX = (float)titleOffsetX.GetDouble();
+                        if (value.TryGetProperty("titleOffsetY", out JsonElement titleOffsetY) && titleOffsetY.ValueKind == JsonValueKind.Number)
+                            nodeOverride.TitleOffsetY = (float)titleOffsetY.GetDouble();
+                        if (value.TryGetProperty("titleScale", out JsonElement titleScale) && titleScale.ValueKind == JsonValueKind.Number)
+                            nodeOverride.TitleScale = (float)titleScale.GetDouble();
 
                         settings.NodeOverrides[property.Name] = nodeOverride;
                     }
@@ -726,18 +877,26 @@ namespace RaceFlow.Admin
         private sealed class SegmentLayout
         {
             public RuntimeSection Section { get; }
+            public RuntimeSegment Segment { get; }
             public FlowSide Side { get; }
             public string Direction { get; }
             public RectangleF TargetRect { get; }
             public RectangleF SourceBounds { get; }
 
-            private readonly float _scale;
-            private readonly float _offsetX;
-            private readonly float _offsetY;
+            private readonly float _baseScale;
+            private readonly float _baseOffsetX;
+            private readonly float _baseOffsetY;
 
-            public SegmentLayout(RuntimeSection section, FlowSide side, string direction, RectangleF targetRect, RectangleF sourceBounds)
+            private float _sectionCenterX;
+            private float _sectionCenterY;
+            private float _sectionScale = 1.0f;
+            private float _sectionOffsetX;
+            private float _sectionOffsetY;
+
+            public SegmentLayout(RuntimeSection section, RuntimeSegment segment, FlowSide side, string direction, RectangleF targetRect, RectangleF sourceBounds)
             {
                 Section = section;
+                Segment = segment;
                 Side = side;
                 Direction = direction;
                 TargetRect = targetRect;
@@ -747,22 +906,55 @@ namespace RaceFlow.Admin
                 float usableHeight = Math.Max(1f, targetRect.Height - 8f);
                 float scaleX = usableWidth / Math.Max(1f, sourceBounds.Width);
                 float scaleY = usableHeight / Math.Max(1f, sourceBounds.Height);
-                float baseScale = Math.Min(scaleX, scaleY);
+                _baseScale = Math.Min(scaleX, scaleY);
 
-                _scale = baseScale * section.VisualScale;
+                float scaledWidth = sourceBounds.Width * _baseScale;
+                float scaledHeight = sourceBounds.Height * _baseScale;
 
-                float scaledWidth = sourceBounds.Width * _scale;
-                float scaledHeight = sourceBounds.Height * _scale;
+                _baseOffsetX = targetRect.Left + ((targetRect.Width - scaledWidth) * 0.5f) - (sourceBounds.Left * _baseScale);
+                _baseOffsetY = targetRect.Top + ((targetRect.Height - scaledHeight) * 0.5f) - (sourceBounds.Top * _baseScale);
+            }
 
-                _offsetX = targetRect.Left + ((targetRect.Width - scaledWidth) * 0.5f) - (sourceBounds.Left * _scale) + section.OffsetX;
-                _offsetY = targetRect.Top + ((targetRect.Height - scaledHeight) * 0.5f) - (sourceBounds.Top * _scale) + section.OffsetY;
+            public void SetSectionTransform(float centerX, float centerY, float sectionScale, float sectionOffsetX, float sectionOffsetY)
+            {
+                _sectionCenterX = centerX;
+                _sectionCenterY = centerY;
+                _sectionScale = Math.Max(0.05f, sectionScale);
+                _sectionOffsetX = sectionOffsetX;
+                _sectionOffsetY = sectionOffsetY;
+            }
+
+            public PointF TransformBase(RuntimeNode node)
+            {
+                PointF point = TransformRawPoint(node.OverlayX, node.OverlayY, Side);
+                point = ApplyDirectionFlip(point, SourceBounds, Side, Direction);
+
+                float baseX = (point.X * _baseScale) + _baseOffsetX;
+                float baseY = (point.Y * _baseScale) + _baseOffsetY;
+
+                float sectionX = _sectionCenterX + ((baseX - _sectionCenterX) * _sectionScale) + _sectionOffsetX;
+                float sectionY = _sectionCenterY + ((baseY - _sectionCenterY) * _sectionScale) + _sectionOffsetY;
+
+                return new PointF(sectionX, sectionY);
             }
 
             public PointF Transform(RuntimeNode node)
             {
-                PointF point = TransformRawPoint(node.OverlayX, node.OverlayY, Side);
-                point = ApplyDirectionFlip(point, SourceBounds, Side, Direction);
-                return new PointF((point.X * _scale) + _offsetX, (point.Y * _scale) + _offsetY);
+                PointF basePoint = TransformBase(node);
+
+                float x = basePoint.X + Segment.OffsetX;
+                float y = basePoint.Y + Segment.OffsetY;
+
+                if (Math.Abs(Segment.VisualScale - 1.0f) > 0.0001f)
+                {
+                    float centerX = TargetRect.Left + (TargetRect.Width * 0.5f) + _sectionOffsetX;
+                    float centerY = TargetRect.Top + (TargetRect.Height * 0.5f) + _sectionOffsetY;
+
+                    x = centerX + ((x - centerX) * Segment.VisualScale);
+                    y = centerY + ((y - centerY) * Segment.VisualScale);
+                }
+
+                return new PointF(x, y);
             }
         }
 
@@ -778,6 +970,7 @@ namespace RaceFlow.Admin
 
             public Dictionary<string, string> NodeImages { get; } = new(StringComparer.OrdinalIgnoreCase);
             public Dictionary<string, SegmentOverride> SegmentOverrides { get; } = new(StringComparer.OrdinalIgnoreCase);
+            public Dictionary<string, NodeTypeOverride> NodeTypeOverrides { get; } = new(StringComparer.OrdinalIgnoreCase);
             public Dictionary<string, NodeOverride> NodeOverrides { get; } = new(StringComparer.OrdinalIgnoreCase);
             public ThemeFlags Settings { get; } = new();
             public RacerThemeSettings Racers { get; } = new();
@@ -796,9 +989,17 @@ namespace RaceFlow.Admin
                 return value;
             }
 
+            public NodeTypeOverride? GetNodeTypeOverride(RuntimeNode node)
+            {
+                string typeKey = node.NodeType.ToString().ToLowerInvariant();
+                NodeTypeOverrides.TryGetValue(typeKey, out NodeTypeOverride? value);
+                return value;
+            }
+
             public NodeVisual ResolveNodeVisual(RuntimeNode node)
             {
                 SegmentOverride? segment = GetSegmentOverride(node.SegmentId);
+                NodeTypeOverride? nodeTypeOverride = GetNodeTypeOverride(node);
                 NodeOverrides.TryGetValue(node.Id, out NodeOverride? nodeOverride);
 
                 string typeKey = node.NodeType.ToString().ToLowerInvariant();
@@ -808,9 +1009,47 @@ namespace RaceFlow.Admin
 
                 return new NodeVisual
                 {
-                    Image = nodeOverride?.Image ?? segment?.NodeImage ?? baseImage,
-                    Scale = nodeOverride?.Scale ?? segment?.NodeScale ?? Settings.NodeScale,
-                    TitleVisible = nodeOverride?.TitleVisible ?? segment?.TitleVisible ?? Settings.TitleVisible,
+                    Image =
+                        nodeOverride?.Image ??
+                        segment?.NodeImage ??
+                        nodeTypeOverride?.Image ??
+                        baseImage,
+
+                    Scale =
+                        nodeOverride?.Scale ??
+                        segment?.NodeScale ??
+                        nodeTypeOverride?.Scale ??
+                        Settings.NodeScale,
+
+                    TitleVisible =
+                        nodeOverride?.TitleVisible ??
+                        segment?.TitleVisible ??
+                        nodeTypeOverride?.TitleVisible ??
+                        Settings.TitleVisible,
+
+                    TitleScale =
+                        nodeOverride?.TitleScale ??
+                        nodeTypeOverride?.TitleScale ??
+                        Settings.TitleScale,
+
+                    TitleOffsetX =
+                        Settings.TitleOffsetX +
+                        (nodeTypeOverride?.TitleOffsetX ?? 0f) +
+                        (nodeOverride?.TitleOffsetX ?? 0f),
+
+                    TitleOffsetY =
+                        Settings.TitleOffsetY +
+                        (nodeTypeOverride?.TitleOffsetY ?? 0f) +
+                        (nodeOverride?.TitleOffsetY ?? 0f),
+
+                    ImageOffsetX =
+                        (nodeTypeOverride?.ImageOffsetX ?? 0f) +
+                        (nodeOverride?.ImageOffsetX ?? 0f),
+
+                    ImageOffsetY =
+                        (nodeTypeOverride?.ImageOffsetY ?? 0f) +
+                        (nodeOverride?.ImageOffsetY ?? 0f),
+
                     Visible = Settings.NodeVisibility
                 };
             }
@@ -868,11 +1107,28 @@ namespace RaceFlow.Admin
             public bool? TitleVisible { get; set; }
         }
 
+        private sealed class NodeTypeOverride
+        {
+            public string? Image { get; set; }
+            public float? Scale { get; set; }
+            public bool? TitleVisible { get; set; }
+            public float? ImageOffsetX { get; set; }
+            public float? ImageOffsetY { get; set; }
+            public float? TitleOffsetX { get; set; }
+            public float? TitleOffsetY { get; set; }
+            public float? TitleScale { get; set; }
+        }
+
         private sealed class NodeOverride
         {
             public string? Image { get; set; }
             public float? Scale { get; set; }
             public bool? TitleVisible { get; set; }
+            public float? ImageOffsetX { get; set; }
+            public float? ImageOffsetY { get; set; }
+            public float? TitleOffsetX { get; set; }
+            public float? TitleOffsetY { get; set; }
+            public float? TitleScale { get; set; }
         }
 
         private sealed class NodeVisual
@@ -880,6 +1136,11 @@ namespace RaceFlow.Admin
             public string? Image { get; set; }
             public float Scale { get; set; } = 1f;
             public bool TitleVisible { get; set; } = true;
+            public float TitleScale { get; set; } = 1f;
+            public float TitleOffsetX { get; set; } = 0f;
+            public float TitleOffsetY { get; set; } = -40f;
+            public float ImageOffsetX { get; set; } = 0f;
+            public float ImageOffsetY { get; set; } = 0f;
             public bool Visible { get; set; } = true;
 
             public static NodeVisual ForDefaults(FlowNodeType nodeType)

@@ -509,7 +509,7 @@ namespace RaceFlow.Admin
             {
                 _overlayWebServer = new OverlayWebServer(5057);
                 _overlayWebServer.Start();
-                _overlayWebServer.UpdateScene(null, null, null);
+                _overlayWebServer.UpdateScene(null, null, null, 1.0f, 0f, 0f, 1.0f, 1.0f);
                 AppendLog($"OBS overlay server started: {_overlayWebServer.OverlayUrl}");
             }
             catch (Exception ex)
@@ -730,7 +730,7 @@ namespace RaceFlow.Admin
                 _sectionLayoutTunerWindow.FormClosed += (_, __) => _sectionLayoutTunerWindow = null;
             }
 
-            _sectionLayoutTunerWindow.BindGraph(_activeGraph);
+            _sectionLayoutTunerWindow.BindData(_activeGraph, _activeFlow?.Admin);
             _sectionLayoutTunerWindow.Show();
             _sectionLayoutTunerWindow.BringToFront();
         }
@@ -952,12 +952,27 @@ namespace RaceFlow.Admin
             int delayMs = _activeFlow?.Admin?.PlaybackDelayMs ?? 0;
             _latestOutputFrame = GetDelayedFrame(delayMs) ?? liveFrame;
 
+            float outputScale = (float)(_activeFlow?.Admin?.OutputScale ?? 1.0);
+            float outputOffsetX = _activeFlow?.Admin?.OutputOffsetX ?? 0f;
+            float outputOffsetY = _activeFlow?.Admin?.OutputOffsetY ?? 0f;
+            float outputNodeTextScale = (float)(_activeFlow?.Admin?.OutputNodeTextScale ?? 1.0);
+            float outputRacerTextScale = (float)(_activeFlow?.Admin?.OutputRacerTextScale ?? 1.0);
+
             PushOverlaySceneToBrowserSource();
 
             if (_outputWindow == null || _outputWindow.IsDisposed)
                 return;
 
-            _outputWindow.UpdateScene(_activeGraph, _latestOutputFrame, delayMs, _activeFlow?.Admin?.ThemeFile);
+            _outputWindow.UpdateScene(
+                _activeGraph,
+                _latestOutputFrame,
+                delayMs,
+                _activeFlow?.Admin?.ThemeFile,
+                outputScale,
+                outputOffsetX,
+                outputOffsetY,
+                outputNodeTextScale,
+                outputRacerTextScale);
         }
 
         private void AddFrameToHistory(RaceOutputFrame frame)
@@ -990,7 +1005,21 @@ namespace RaceFlow.Admin
         private void PushOverlaySceneToBrowserSource()
         {
             string? themeFile = _activeFlow?.Admin?.ThemeFile;
-            _overlayWebServer?.UpdateScene(_activeGraph, _latestOutputFrame, themeFile);
+            float outputScale = (float)(_activeFlow?.Admin?.OutputScale ?? 1.0);
+            float outputOffsetX = _activeFlow?.Admin?.OutputOffsetX ?? 0f;
+            float outputOffsetY = _activeFlow?.Admin?.OutputOffsetY ?? 0f;
+            float outputNodeTextScale = (float)(_activeFlow?.Admin?.OutputNodeTextScale ?? 1.0);
+            float outputRacerTextScale = (float)(_activeFlow?.Admin?.OutputRacerTextScale ?? 1.0);
+
+            _overlayWebServer?.UpdateScene(
+                _activeGraph,
+                _latestOutputFrame,
+                themeFile,
+                outputScale,
+                outputOffsetX,
+                outputOffsetY,
+                outputNodeTextScale,
+                outputRacerTextScale);
         }
 
         private void LoadAndBuildFlow(string filePath, bool resetGrid)
@@ -1018,7 +1047,7 @@ namespace RaceFlow.Admin
             if (!string.IsNullOrWhiteSpace(_activeFlow.Admin.ThemeFile))
                 AppendLog($"Theme file: {_activeFlow.Admin.ThemeFile}");
 
-            _sectionLayoutTunerWindow?.BindGraph(_activeGraph);
+            _sectionLayoutTunerWindow?.BindData(_activeGraph, _activeFlow?.Admin);
 
             if (_activeGraph != null)
             {
@@ -1049,7 +1078,7 @@ namespace RaceFlow.Admin
             _activeGraph = _graphBuilder.Build(_activeFlow);
             _runtimeCoordinator = new RaceRuntimeCoordinator(_activeGraph, _resolver);
 
-            _sectionLayoutTunerWindow?.BindGraph(_activeGraph);
+            _sectionLayoutTunerWindow?.BindData(_activeGraph, _activeFlow?.Admin);
 
             if (resetGrid)
             {
@@ -1079,6 +1108,19 @@ namespace RaceFlow.Admin
                 flowSection.VisualScale = runtimeSection.VisualScale;
                 flowSection.OffsetX = runtimeSection.OffsetX;
                 flowSection.OffsetY = runtimeSection.OffsetY;
+
+                foreach (var flowSegment in flowSection.Segments)
+                {
+                    var runtimeSegment = _activeGraph.Segments
+                        .FirstOrDefault(s => string.Equals(s.Id, flowSegment.Id, StringComparison.OrdinalIgnoreCase));
+
+                    if (runtimeSegment == null)
+                        continue;
+
+                    flowSegment.VisualScale = runtimeSegment.VisualScale;
+                    flowSegment.OffsetX = runtimeSegment.OffsetX;
+                    flowSegment.OffsetY = runtimeSegment.OffsetY;
+                }
             }
         }
 
