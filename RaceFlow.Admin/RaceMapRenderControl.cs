@@ -382,6 +382,8 @@ namespace RaceFlow.Admin
             if (theme?.Settings.LineVisibility == false)
                 return;
 
+            var drawableEdges = new List<DrawableEdge>();
+
             foreach (RuntimeEdge edge in graph.Edges)
             {
                 if (edge.FromNode == null || edge.ToNode == null)
@@ -389,36 +391,56 @@ namespace RaceFlow.Admin
 
                 PointF aCenter = transform(edge.FromNode);
                 PointF bCenter = transform(edge.ToNode);
-                (PointF a, PointF b) = GetTrimmedEdgePoints(edge.FromNode, edge.ToNode, aCenter, bCenter, theme);
 
                 SegmentOverride? segmentOverride = theme?.GetSegmentOverride(edge.FromNode.SegmentId);
                 Color lineColor = theme?.ResolveLineColor(edge.FromNode, edge.ToNode, segmentOverride) ?? Color.FromArgb(95, 120, 140);
                 float thickness = theme?.ResolveLineThickness(segmentOverride) ?? 3f;
 
-                using var pen = new Pen(lineColor, thickness)
-                {
-                    StartCap = LineCap.Round,
-                    EndCap = LineCap.Round
-                };
+                drawableEdges.Add(new DrawableEdge(aCenter, bCenter, lineColor, thickness));
+            }
 
-                if (theme?.Settings.ShadowEnabled == true)
+            if (drawableEdges.Count == 0)
+                return;
+
+            if (theme?.Settings.ShadowEnabled == true)
+            {
+                int alpha = (int)Math.Round(255f * Math.Max(0f, Math.Min(1f, theme.Settings.ShadowOpacity)));
+
+                foreach (var group in drawableEdges.GroupBy(e => Math.Round(e.Thickness, 2)))
                 {
-                    int alpha = (int)Math.Round(255f * Math.Max(0f, Math.Min(1f, theme.Settings.ShadowOpacity)));
-                    using var shadowPen = new Pen(Color.FromArgb(alpha, 0, 0, 0), thickness + 2f)
+                    using var shadowPath = new GraphicsPath();
+
+                    foreach (DrawableEdge edge in group)
+                    {
+                        shadowPath.StartFigure();
+                        shadowPath.AddLine(
+                            edge.A.X + theme.Settings.ShadowOffsetX,
+                            edge.A.Y + theme.Settings.ShadowOffsetY,
+                            edge.B.X + theme.Settings.ShadowOffsetX,
+                            edge.B.Y + theme.Settings.ShadowOffsetY);
+                    }
+
+                    using var shadowPen = new Pen(Color.FromArgb(alpha, 0, 0, 0), (float)group.Key + 2f)
                     {
                         StartCap = LineCap.Round,
-                        EndCap = LineCap.Round
+                        EndCap = LineCap.Round,
+                        LineJoin = LineJoin.Round
                     };
 
-                    g.DrawLine(
-                        shadowPen,
-                        a.X + theme.Settings.ShadowOffsetX,
-                        a.Y + theme.Settings.ShadowOffsetY,
-                        b.X + theme.Settings.ShadowOffsetX,
-                        b.Y + theme.Settings.ShadowOffsetY);
+                    g.DrawPath(shadowPen, shadowPath);
                 }
+            }
 
-                g.DrawLine(pen, a, b);
+            foreach (DrawableEdge edge in drawableEdges)
+            {
+                using var pen = new Pen(edge.Color, edge.Thickness)
+                {
+                    StartCap = LineCap.Round,
+                    EndCap = LineCap.Round,
+                    LineJoin = LineJoin.Round
+                };
+
+                g.DrawLine(pen, edge.A, edge.B);
             }
         }
 
@@ -957,6 +979,8 @@ namespace RaceFlow.Admin
                 return new PointF(x, y);
             }
         }
+
+        private readonly record struct DrawableEdge(PointF A, PointF B, Color Color, float Thickness);
 
         private sealed class ThemeSettings
         {

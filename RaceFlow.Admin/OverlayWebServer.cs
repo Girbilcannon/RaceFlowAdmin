@@ -808,6 +808,7 @@ function applyDirectionFlip(point, bounds, side, direction) {
 
 function drawEdges(data, nodeMap, segmentLayouts) {
     const renderMode = getLineRenderMode();
+    const drawableEdges = [];
 
     for (const edge of data.edges || []) {
         const fromNode = nodeMap[edge.fromNodeId];
@@ -818,66 +819,92 @@ function drawEdges(data, nodeMap, segmentLayouts) {
 
         const aCenter = transformNode(fromNode, segmentLayouts);
         const bCenter = transformNode(toNode, segmentLayouts);
-
-        const trimmed = getTrimmedEdgePoints(fromNode, toNode, aCenter, bCenter);
-        const a = trimmed.a;
-        const b = trimmed.b;
-
         const lineStyle = getResolvedLineStyle(fromNode, toNode);
 
-        if (renderMode === "textured") {
-            const img = lineStyle.imageFile ? imageCache[lineStyle.imageFile] : null;
+        drawableEdges.push({
+            a: aCenter,
+            b: bCenter,
+            style: lineStyle
+        });
+    }
 
-            if (img && img.complete) {
-                const dx = b.x - a.x;
-                const dy = b.y - a.y;
-                const length = Math.hypot(dx, dy);
-                const angle = Math.atan2(dy, dx);
-                const step = Math.max(8, (lineStyle.step || 32));
-                const texSize = Math.max(8, (lineStyle.textureSize || 32));
+    if (drawableEdges.length === 0)
+        return;
 
-                ctx.save();
-                ctx.translate(a.x, a.y);
-                ctx.rotate(angle);
+    if (renderMode === "textured") {
+        for (const edge of drawableEdges) {
+            const img = edge.style.imageFile ? imageCache[edge.style.imageFile] : null;
 
-                for (let i = 0; i < length; i += step) {
-                    ctx.save();
-                    ctx.translate(i, 0);
-                    ctx.rotate(Math.PI / 2);
-                    ctx.drawImage(img, -(texSize * 0.5), -(texSize * 0.5), texSize, texSize);
-                    ctx.restore();
-                }
-
-                ctx.restore();
+            if (!img || !img.complete)
                 continue;
+
+            const dx = edge.b.x - edge.a.x;
+            const dy = edge.b.y - edge.a.y;
+            const length = Math.hypot(dx, dy);
+            const angle = Math.atan2(dy, dx);
+            const step = Math.max(8, (edge.style.step || 32));
+            const texSize = Math.max(8, (edge.style.textureSize || 32));
+
+            ctx.save();
+            ctx.translate(edge.a.x, edge.a.y);
+            ctx.rotate(angle);
+
+            for (let i = 0; i < length; i += step) {
+                ctx.save();
+                ctx.translate(i, 0);
+                ctx.rotate(Math.PI / 2);
+                ctx.drawImage(img, -(texSize * 0.5), -(texSize * 0.5), texSize, texSize);
+                ctx.restore();
             }
+
+            ctx.restore();
+        }
+
+        return;
+    }
+
+    if (isShadowEnabled()) {
+        const groups = new Map();
+
+        for (const edge of drawableEdges) {
+            const key = String(Math.round(edge.style.thickness * 100) / 100);
+            if (!groups.has(key))
+                groups.set(key, []);
+            groups.get(key).push(edge);
         }
 
         ctx.save();
+        ctx.strokeStyle = `rgba(0,0,0,${getShadowOpacity()})`;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.shadowColor = `rgba(0,0,0,${getShadowOpacity()})`;
+        ctx.shadowBlur = getShadowBlur();
 
-        if (isShadowEnabled()) {
-            ctx.strokeStyle = `rgba(0,0,0,${getShadowOpacity()})`;
-            ctx.lineWidth = Math.max(1, lineStyle.thickness + 2);
-            ctx.lineCap = "round";
-            ctx.shadowColor = `rgba(0,0,0,${getShadowOpacity()})`;
-            ctx.shadowBlur = getShadowBlur();
+        for (const [key, edges] of groups) {
+            ctx.lineWidth = Math.max(1, Number(key) + 2);
             ctx.beginPath();
-            ctx.moveTo(a.x + getShadowOffsetX(), a.y + getShadowOffsetY());
-            ctx.lineTo(b.x + getShadowOffsetX(), b.y + getShadowOffsetY());
-            ctx.stroke();
 
-            ctx.shadowColor = "transparent";
-            ctx.shadowBlur = 0;
+            for (const edge of edges) {
+                ctx.moveTo(edge.a.x + getShadowOffsetX(), edge.a.y + getShadowOffsetY());
+                ctx.lineTo(edge.b.x + getShadowOffsetX(), edge.b.y + getShadowOffsetY());
+            }
+
+            ctx.stroke();
         }
 
-        ctx.strokeStyle = lineStyle.color;
-        ctx.lineWidth = lineStyle.thickness;
-        ctx.lineCap = "round";
-        ctx.beginPath();
-        ctx.moveTo(a.x, a.y);
-        ctx.lineTo(b.x, b.y);
-        ctx.stroke();
+        ctx.restore();
+    }
 
+    for (const edge of drawableEdges) {
+        ctx.save();
+        ctx.strokeStyle = edge.style.color;
+        ctx.lineWidth = edge.style.thickness;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        ctx.moveTo(edge.a.x, edge.a.y);
+        ctx.lineTo(edge.b.x, edge.b.y);
+        ctx.stroke();
         ctx.restore();
     }
 }

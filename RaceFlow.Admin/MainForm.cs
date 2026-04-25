@@ -62,6 +62,7 @@ namespace RaceFlow.Admin
         private Task? _socketTask;
 
         private readonly Dictionary<string, DataGridViewRow> _racerRows = new();
+        private readonly HashSet<string> _manuallyRemovedRacerKeys = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, BeetleRankUserSnapshot> _latestUserSnapshots = new();
         private readonly List<ThemeListItem> _availableThemes = new();
         private readonly List<RaceOutputFrame> _outputFrameHistory = new();
@@ -272,6 +273,19 @@ namespace RaceFlow.Admin
             _gridRacers.DefaultCellStyle.SelectionBackColor = Color.FromArgb(64, 92, 140);
             _gridRacers.DefaultCellStyle.SelectionForeColor = Color.White;
 
+            var removeColumn = new DataGridViewButtonColumn
+            {
+                Name = "RemoveRacer",
+                HeaderText = "",
+                Text = "X",
+                UseColumnTextForButtonValue = true,
+                Width = 34,
+                MinimumWidth = 34,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
+                FlatStyle = FlatStyle.Popup
+            };
+
+            _gridRacers.Columns.Add(removeColumn);
             _gridRacers.Columns.Add("RacerName", "Racer");
             _gridRacers.Columns.Add("SessionCode", "Session");
             _gridRacers.Columns.Add("MapId", "Map");
@@ -501,6 +515,7 @@ namespace RaceFlow.Admin
             _btnOpenOutputTuner.Click += BtnOpenOutputTuner_Click;
             _cmbTheme.SelectedIndexChanged += CmbTheme_SelectedIndexChanged;
             _gridRacers.SelectionChanged += GridRacers_SelectionChanged;
+            _gridRacers.CellContentClick += GridRacers_CellContentClick;
         }
 
         private void StartOverlayWebServer()
@@ -916,6 +931,9 @@ namespace RaceFlow.Admin
 
             foreach (KeyValuePair<string, RacerRuntimeState> pair in _runtimeCoordinator.Racers.OrderBy(p => p.Value.RacerName))
             {
+                if (_manuallyRemovedRacerKeys.Contains(pair.Key))
+                    continue;
+
                 RacerRuntimeState racer = pair.Value;
 
                 string colorHex = "#FFFFFF";
@@ -1230,6 +1248,10 @@ namespace RaceFlow.Admin
                             continue;
 
                         string racerKey = BeetleRankTelemetryMapper.BuildRacerKey(user);
+
+                        if (_manuallyRemovedRacerKeys.Contains(racerKey))
+                            continue;
+
                         _latestUserSnapshots[racerKey] = user;
 
                         if (_runtimeCoordinator.Racers.TryGetValue(racerKey, out RacerRuntimeState? racerState))
@@ -1257,6 +1279,10 @@ namespace RaceFlow.Admin
                             continue;
 
                         string racerKey = BeetleRankTelemetryMapper.BuildRacerKey(user);
+
+                        if (_manuallyRemovedRacerKeys.Contains(racerKey))
+                            continue;
+
                         _latestUserSnapshots[racerKey] = user;
 
                         UpsertBasicRacerRow(user);
@@ -1345,6 +1371,38 @@ namespace RaceFlow.Admin
             row.Tag = racerKey;
             _racerRows[racerKey] = row;
             return row;
+        }
+
+        private void GridRacers_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0)
+                return;
+
+            if (_gridRacers.Columns[e.ColumnIndex].Name != "RemoveRacer")
+                return;
+
+            if (_gridRacers.Rows[e.RowIndex].Tag is not string racerKey)
+                return;
+
+            RemoveRacerFromAdminList(racerKey);
+        }
+
+        private void RemoveRacerFromAdminList(string racerKey)
+        {
+            _manuallyRemovedRacerKeys.Add(racerKey);
+
+            if (_racerRows.TryGetValue(racerKey, out DataGridViewRow? row))
+            {
+                _gridRacers.Rows.Remove(row);
+                _racerRows.Remove(racerKey);
+            }
+
+            _latestUserSnapshots.Remove(racerKey);
+
+            ClearSelectedRacerDetails();
+            RefreshRaceOutputWindow();
+
+            AppendLog($"Racer removed from admin list: {racerKey}");
         }
 
         private void GridRacers_SelectionChanged(object? sender, EventArgs e)
